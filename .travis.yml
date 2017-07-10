@@ -1,0 +1,38 @@
+# vim ft=yaml
+language: python
+
+cache: pip
+
+env:
+  global:
+    - DEPENDS="requirements.txt"
+    - COVERAGE=1
+
+python:
+  - 2.7
+  - 3.4
+  - 3.5
+
+before_install:
+  - virtualenv --python=python venv
+  - source venv/bin/activate
+  - python --version
+  - pip install --upgrade pip
+  - pip install -r requirements.txt
+
+install:
+  - python setup.py install
+#  
+
+# command to run tests
+script: nosetests
+
+
+#script:
+#  - make coverage
+#  - pip install -r requirements/doc.txt
+#  - cd doc && make html && cd ..
+#  - cd doc && make doctest && cd ..
+
+#after_success:
+#  - if [ "${COVERAGE}" == "1" ]; then coveralls; fi
