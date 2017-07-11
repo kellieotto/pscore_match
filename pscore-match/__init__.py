@@ -1,1 +1,2 @@
-from pscore-match import *
+from pscore import *
+from match import *
