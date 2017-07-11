@@ -2,7 +2,6 @@
 Implements several types of propensity-score matching.
 """
 
-
 from __future__ import division
 import numpy as np
 import scipy
@@ -21,16 +20,24 @@ def Match(groups, propensity, caliper = 0.05, caliper_method = "propensity", rep
     ''' 
     Implements greedy one-to-one matching on propensity scores.
     
-    Inputs:
-    groups = Array-like object of treatment assignments.  Must be 2 groups
-    propensity = Array-like object containing propensity scores for each observation. Propensity and groups should be in the same order (matching indices)
-    caliper = a numeric value, specifies maximum distance (difference in propensity scores or SD of logit propensity) 
-    caliper_method = a string: "propensity" (default) if caliper is a maximum difference in propensity scores,
-            "logit" if caliper is a maximum SD of logit propensity, or "none" for no caliper
-    replace = Logical for whether individuals from the larger group should be allowed to match multiple individuals in the smaller group.
+    Parameters
+    -----------
+    groups : array-like 
+        treatment assignments, must be 2 groups
+    propensity : array-like 
+        object containing propensity scores for each observation. 
+        Propensity and groups should be in the same order (matching indices)
+    caliper : float
+         specifies maximum distance (difference in propensity scores or SD of logit propensity) 
+    caliper_method: string
+        "propensity" (default) if caliper is a maximum difference in propensity scores,
+        "logit" if caliper is a maximum SD of logit propensity, or "none" for no caliper
+    replace : bool
+        should individuals from the larger group be allowed to match multiple individuals in the smaller group?
         (default is False)
     
-    Output:
+    Returns
+    --------
     A series containing the individuals in the control group matched to the treatment group.
     Note that with caliper matching, not every treated individual may have a match.
     '''
@@ -85,18 +92,28 @@ def MatchMany(groups, propensity, method = "caliper", k = 1, caliper = 0.05, cal
     ''' 
     Implements greedy one-to-many matching on propensity scores.
     
-    Inputs:
-    groups = Array-like object of treatment assignments.  Must be 2 groups
-    propensity = Array-like object containing propensity scores for each observation. Propensity and groups should be in the same order (matching indices)
-    method = a string: "caliper" (default) to select all matches within a given range, "knn" for k nearest neighbors,
-    k = an integer (default is 1). If method is "knn", this specifies the k in k nearest neighbors
-    caliper = a numeric value, specifies maximum distance (difference in propensity scores or SD of logit propensity) 
-    caliper_method = a string: "propensity" (default) if caliper is a maximum difference in propensity scores,
-            "logit" if caliper is a maximum SD of logit propensity, or "none" for no caliper
-    replace = Logical for whether individuals from the larger group should be allowed to match multiple individuals in the smaller group.
-        (default is True)
+    Parameters
+    -----------
+    groups : array-like 
+        treatment assignments, must be 2 groups
+    propensity : array-like 
+        object containing propensity scores for each observation. 
+        Propensity and groups should be in the same order (matching indices)
+    method : string
+        "caliper" (default) to select all matches within a given range, "knn" for k nearest neighbors,
+    k : int
+        (default is 1). If method is "knn", this specifies the k in k nearest neighbors
+    caliper : float
+         specifies maximum distance (difference in propensity scores or SD of logit propensity) 
+    caliper_method: string
+        "propensity" (default) if caliper is a maximum difference in propensity scores,
+        "logit" if caliper is a maximum SD of logit propensity, or "none" for no caliper
+    replace : bool
+        should individuals from the larger group be allowed to match multiple individuals in the smaller group?
+        (default is False)
     
-    Output:
+    Returns
+    --------
     A series containing the individuals in the control group matched to the treatment group.
     Note that with caliper matching, not every treated individual may have a match within calipers.
         In that case we match it to its single nearest neighbor.  The alternative is to throw out individuals with no matches, but then we'd no longer be estimating the ATT.
@@ -159,11 +176,17 @@ def MatchMany(groups, propensity, method = "caliper", k = 1, caliper = 0.05, cal
 def whichMatched(matches, data, many = False, unique = False):
     ''' 
     Simple function to convert output of Matches to DataFrame of all matched observations
-    Inputs:
-    matches = output of Match
-    data = DataFrame of covariates
-    many = Boolean indicating if matching method is one-to-one or one-to-many
-    unique = Boolean indicating if duplicated individuals (ie controls matched to more than one case) should be removed
+    
+    Parameters
+    -----------
+    matches : 
+        output of Match
+    data : DataFrame 
+        covariates
+    many : bool
+        is matching method is one-to-one (False) or one-to-many (True)
+    unique : bool
+        True if duplicated individuals (ie controls matched to more than one case) should be removed
     '''
 
     tr = matches.keys()
@@ -177,7 +200,7 @@ def whichMatched(matches, data, many = False, unique = False):
         return temp.groupby(temp.index).first()
     else:
         return temp
-        
+
 
 def getWeights(matches, groups):
     ''' computes weights for mean & regression according to how many times a control was matched in one-many matching'''
@@ -192,11 +215,17 @@ def getWeights(matches, groups):
 def whichMatched(matches, data, many = False, unique = False):
     ''' 
     Simple function to convert output of Matches to DataFrame of all matched observations
-    Inputs:
-    matches = output of Match
-    data = DataFrame of covariates
-    many = Boolean indicating if matching method is one-to-one or one-to-many
-    unique = Boolean indicating if duplicated individuals (ie controls matched to more than one case) should be removed
+    
+    Parameters
+    -----------
+    matches : 
+        output of Match
+    data : DataFrame 
+        covariates
+    many : bool
+        is matching method is one-to-one (False) or one-to-many (True)
+    unique : bool
+        True if duplicated individuals (ie controls matched to more than one case) should be removed
     '''
 
     tr = matches.keys()

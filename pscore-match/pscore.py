@@ -22,10 +22,14 @@ def computePropensityScore(formula, data, verbosity=1):
     '''
     Compute propensity scores 
     
-    Inputs:
-    formula = string of the form 'Treatment~ covariate1 + covariate2 + ...', where these are column names in data
-    data = matrix-like object with columns corresponding to terms in the formula
-    verbosity = whether or not to print glm summary
+    Parameters
+    -----------
+    formula : string 
+        Must have the form 'Treatment~ covariate1 + covariate2 + ...', where these are column names in data
+    data : array-like 
+        Matrix with columns corresponding to terms in the formula
+    verbosity : bool
+        whether or not to print glm summary
     
     dependencies: LogisticRegression from sklearn.linear_model
                   statsmodels as sm
@@ -58,10 +62,14 @@ def averageTreatmentEffect(groups, response, matches):
     Computes ATT using difference in means.
     The data passed in should already have unmatched individuals and duplicates removed.
 
-    Inputs:
-    groups = Series containing treatment assignment. Must be 2 groups
-    response = Series containing response measurements. Indices should match those of groups.
-    matches = output of Match or MatchMany
+    Parameters
+    -----------
+    groups : pd.Series 
+        treatment assignment. Must be 2 groups
+    response : pd.Series 
+        response measurements. Indices should match those of groups.
+    matches : 
+        output of Match or MatchMany
     '''
     if len(groups.unique()) != 2:
         raise ValueError('wrong number of groups: expected 2')
@@ -81,12 +89,16 @@ def regressAverageTreatmentEffect(groups, response, covariates, matches=None, ve
     This works for one-to-one matching.   The data passed in should already have unmatched individuals removed.
     Weights argument will be added later for one-many matching
     
-    Inputs:
-    groups = Series containing treatment assignment. Must be 2 groups
-    response = Series containing response measurements. Indices should match those of groups.
-    covariates = DataFrame containing the covariates to include in the linear regression
-    matches = optional: if using one-many matching, should be the output of MatchMany.
-            Use None for one-one matching.
+    Parameters
+    -----------
+    groups : pd.Series 
+        treatment assignment. Must be 2 groups
+    response : pd.Series 
+        response measurements. Indices should match those of groups.
+    covariates : pd.DataFrame 
+        the covariates to include in the linear regression
+    matches : 
+        output of Match or MatchMany
     
     Dependencies: statsmodels.api as sm, pandas as pd
     '''
@@ -108,12 +120,14 @@ def regressAverageTreatmentEffect(groups, response, covariates, matches=None, ve
 
 def sampleWithinGroups(groups, data):
     '''
-    To use in bootstrapping functions.  
-    Sample with replacement from each group, return bootstrap sample dataframe
+    To use in bootstrapping functions.  Sample with replacement from each group, return bootstrap sample dataframe.
     
-    Inputs:
-    groups = Series containing treatment assignment. Must be 2 groups
-    data   = Dataframe containing observations from which to create bootstrap sample.
+    Parameters
+    -----------
+    groups : pd.Series 
+        treatment assignment. Must be 2 groups
+    data : Dataframe 
+        observations from which to create bootstrap sample.
     '''
     bootdata = pd.DataFrame()
     for g in groups.unique():
@@ -130,12 +144,18 @@ def bootstrapATT(groups, response, propensity, many=True, B = 500, method = "cal
     Sample observations with replacement, within each treatment group. Then match them and compute ATT.
     Repeat B times and take standard deviation.
     
-    Inputs:
-    groups = Series containing treatment assignment. Must be 2 groups
-    response = Series containing response measurements
-    propensity = Series containing propensity scores
-    many = Boolean: are we using one-many matching?
-    B = number of bootstrap replicates. Default is 500
+    Parameters
+    -----------
+    groups : pd.Series 
+        treatment assignment. Must be 2 groups
+    response : pd.Series 
+        response measurements
+    propensity : pd.Series 
+        propensity scores
+    many : bool
+        are we using one-many matching?
+    B : int
+        number of bootstrap replicates. Default is 500
     caliper, caliper_method, replace = arguments to pass to Match or MatchMany
     method, k = arguments to pass to MatchMany
     '''
@@ -160,13 +180,20 @@ def bootstrapRegression(groups, response, propensity, covariates, many = True, B
     Sample observations with replacement, within each treatment group. Then match them and compute ATT.
     Repeat B times and take standard deviation.
     
-    Inputs:
-    groups = Series containing treatment assignment. Must be 2 groups
-    response = Series containing response measurements
-    propensity = Series containing propensity scores
-    covariates = DataFrame containing covariates to use in regression
-    many = Boolean: are we using one-many matching?
-    B = number of bootstrap replicates. Default is 500
+    Parameters
+    -----------
+    groups : pd.Series 
+        treatment assignment. Must be 2 groups
+    response : pd.Series 
+        response measurements
+    propensity : pd.Series 
+        propensity scores
+    covariates : pd.DataFrame 
+        covariates to use in regression
+    many : bool
+        are we using one-many matching?
+    B : int
+        number of bootstrap replicates. Default is 500
     caliper, caliper_method, replace = arguments to pass to Match or MatchMany
     method, k = arguments to pass to MatchMany
     '''
@@ -204,10 +231,16 @@ def plotScores(groups, propensity, matches, many=True):
     '''
     Plot density of propensity scores for each group before and after matching
     
-    Inputs: groups = treatment assignment, pre-matching
-            propensity = propensity scores, pre-matching
-            matches = output of Match or MatchMany
-            many = indicator - True if one-many matching was done (default is True), otherwise False
+    Parameters
+    ----------- 
+    groups : pd.Series
+        treatment assignment, pre-matching
+    propensity : pd.Series
+        propensity scores, pre-matching
+    matches :
+        output of Match or MatchMany
+    many : bool
+        True if one-many matching was done (default is True), otherwise False
     '''
     pre = pd.DataFrame({'groups':groups, 'propensity':propensity})    
     post = whichMatched(matches, pre, many = many, unique = False)
@@ -217,10 +250,6 @@ def plotScores(groups, propensity, matches, many=True):
     density0 = scipy.stats.gaussian_kde(pre.propensity[pre.groups==0])
     density1 = scipy.stats.gaussian_kde(pre.propensity[pre.groups==1])
     xs = np.linspace(0,1,1000)
-    #density0.covariance_factor = lambda : 0.5
-    #density0._compute_covariance()
-    #density1.covariance_factor = lambda : 0.5
-    #density1._compute_covariance()
     plt.plot(xs,density0(xs),color='black')
     plt.fill_between(xs,density1(xs),color='gray')
     plt.title('Before Matching')
@@ -231,10 +260,6 @@ def plotScores(groups, propensity, matches, many=True):
     density0_post = scipy.stats.gaussian_kde(post.propensity[post.groups==0])
     density1_post = scipy.stats.gaussian_kde(post.propensity[post.groups==1])
     xs = np.linspace(0,1,1000)
-    #density0.covariance_factor = lambda : 0.5
-    #density0._compute_covariance()
-    #density1.covariance_factor = lambda : 0.5
-    #density1._compute_covariance()
     plt.plot(xs,density0_post(xs),color='black')
     plt.fill_between(xs,density1_post(xs),color='gray')
     plt.title('After Matching')
