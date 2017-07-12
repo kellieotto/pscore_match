@@ -9,7 +9,6 @@ from scipy.stats import binom, hypergeom, gaussian_kde
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LogisticRegression
-from ModelMatch import binByQuantiles
 import statsmodels.api as sm
 
 ################################################################################
