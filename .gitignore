@@ -99,3 +99,7 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# Sphinx documentation
+doc/build/
+doc/source/_static/test.png
