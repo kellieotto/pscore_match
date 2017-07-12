@@ -1,5 +1,6 @@
 Core functions
 --------------
 
-.. automodule:: pscore-match.match
-          :members:
+.. automodule:: pscore_match.match
+    :members:
+	

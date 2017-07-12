@@ -6,14 +6,14 @@ descr = """Propensity score matching
 import os
 
 
-DISTNAME = 'pscore-match'
+DISTNAME = 'pscore_match'
 DESCRIPTION = 'Propensity score matching'
 LONG_DESCRIPTION = descr
 AUTHOR = 'Kellie Ottoboni'
 AUTHOR_EMAIL = 'kellieotto@berkeley.edu'
-URL = 'http://www.github.com/kellieotto/pscore-match'
+URL = 'http://www.github.com/kellieotto/pscore_match'
 LICENSE = 'BSD 2 License'
-DOWNLOAD_URL = 'http://www.github.com/kellieotto/pscore-match'
+DOWNLOAD_URL = 'http://www.github.com/kellieotto/pscore_match'
 VERSION = '0.1dev'
 PYTHON_VERSION = (2, 7)
 
@@ -29,7 +29,7 @@ TESTS_REQUIRE = [
 ]
 
 
-def write_version_py(filename='pscore-match/version.py'):
+def write_version_py(filename='pscore_match/version.py'):
     template = """# THIS FILE IS GENERATED FROM THE PSCORE-MATCH SETUP.PY
 version='%s'
 """
@@ -39,7 +39,7 @@ version='%s'
         with open(fname, 'w') as f:
             f.write(template % VERSION)
     except IOError:
-        raise IOError("Could not open/write to pscore-match/version.py - did you "
+        raise IOError("Could not open/write to pscore_match/version.py - did you "
                       "install using sudo in the past? If so, run\n"
                       "sudo chown -R your_username ./*\n"
                       "from package root to fix permissions, and try again.")
@@ -81,5 +81,5 @@ if __name__ == "__main__":
         install_requires=INSTALL_REQUIRES,
         tests_require=TESTS_REQUIRE,
 
-        packages=['pscore-match', 'pscore-match.tests',],
+        packages=['pscore_match', 'pscore_match.tests',],
     )

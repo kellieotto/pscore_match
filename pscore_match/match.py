@@ -1,5 +1,5 @@
 """
-Implements several types of propensity-score matching.
+Implements several types of propensity score matching.
 """
 
 from __future__ import division
