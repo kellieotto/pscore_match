@@ -7,10 +7,11 @@ from numpy.testing import assert_equal
 def test_ggi():
     """ Test that "Gerber-Green-Imai" data can be loaded. """
     ggi = data.gerber_green_imai()
-    assert_equal((botulinum.shape, (10829, 26))
+    assert_equal(ggi.shape, (10829, 26))
 
 
 def test_dw():
     """ Test that "Dehejia-Wahba" data can be loaded. """
     dw = data.dehejia_wahba()
-    assert_equal((dw.shape, (445, 10))
+    assert_equal(dw.shape, (445, 10))
+    

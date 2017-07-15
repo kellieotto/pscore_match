@@ -10,7 +10,6 @@ import scipy
 from scipy.stats import binom, hypergeom, gaussian_kde
 import pandas as pd
 import matplotlib.pyplot as plt
-from sklearn.linear_model import LogisticRegression
 import statsmodels.api as sm
 
 ################################################################################
@@ -31,6 +30,8 @@ class PropensityScore(object):
         covariates : pd.DataFrame
             covariates, one row for each observation
         """
+        assert treatment.shape[0]==covariates.shape[0], 'Number of observations in \
+            treated and covariates doesnt match'
         self.treatment = treatment
         self.covariates = covariates
         
@@ -54,7 +55,7 @@ class PropensityScore(object):
         elif method == 'probit':
             model = sm.Probit(self.treatment, predictors).fit(disp=False, warn_convergence=True)
         else:
-            raise ValueError, 'Unrecognized method'
+            raise ValueError('Unrecognized method')
         return model.predict()
 
         ####### Using sm.formula.glm with formula call
@@ -94,7 +95,7 @@ def computePropensityScore(formula, data, verbosity=1):
     glm_binom = sm.formula.glm(formula = formula, data = data, family = sm.families.Binomial())
     res = glm_binom.fit()
     if verbosity:
-        print res.summary()
+        print(res.summary())
     return res.fittedvalues
 
 
@@ -158,7 +159,7 @@ def regressAverageTreatmentEffect(groups, response, covariates, matches=None, ve
         for i in matchcounts.index:
             weights[i] = matchcounts[i]
         if verbosity:
-            print weights.value_counts(), weights.shape
+            print(weights.value_counts(), weights.shape)
     X = pd.concat([groups, covariates], axis=1)
     X = sm.add_constant(X, prepend=False)
     linmodel = sm.WLS(response, X, weights = weights).fit()
@@ -270,7 +271,7 @@ def Balance(groups, covariates):
     dist = abs(means.diff()).ix[1]
     std = covariates.groupby(groups).std()
     n = groups.value_counts()
-    se = std.apply(lambda(s): np.sqrt(s[0]**2/n[0] + s[1]**2/n[1]))
+    se = std.apply(lambda s: np.sqrt(s[0]**2/n[0] + s[1]**2/n[1]))
     return dist, se
 
 def plotScores(groups, propensity, matches, many=True):
