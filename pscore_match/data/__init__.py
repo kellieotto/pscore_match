@@ -4,6 +4,8 @@ from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
 import os as _os
 import numpy as np
+import pandas as pd
+from .. import data_dir
 
 __all__ = ['gerber_green_imai',
            'dehejia_wahba']
@@ -27,7 +29,8 @@ def gerber_green_imai():
     statistical methods for field experiments." American Political Science Review 99: 
     283-300.
     """
-    return pd.read_table('../data/GerberGreenImai.txt', sep = '\s+')
+    fin = _os.path.join(data_dir, 'GerberGreenImai.txt')
+    return pd.read_table(fin, sep = '\s+')
 
 
 def dehejia_wahba():
@@ -47,9 +50,11 @@ def dehejia_wahba():
     """
     names = ['Treated', 'Age', 'Education', 'Black', 'Hispanic', 'Married',
              'Nodegree', 'RE74', 'RE75', 'RE78']
-    treated = pd.read_table('../data/nswre74_treated.txt', sep = '\s+',
+    fin_tr = _os.path.join(data_dir, 'nswre74_treated.txt')
+    fin_ct = _os.path.join(data_dir, 'nswre74_control.txt')
+    treated = pd.read_table(fin_tr, sep = '\s+',
                             header = None, names = names)
-    control = pd.read_table('../data/nswre74_control.txt', sep='\s+', 
+    control = pd.read_table(fin_ct, sep='\s+', 
                             header = None, names = names)
     data = pd.concat([treated, control])
     return data
