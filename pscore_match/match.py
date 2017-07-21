@@ -63,7 +63,10 @@ class Match(object):
         assert self.groups.shape==self.propensity.shape, "Input dimensions dont match"
         assert all(self.propensity >=0) and all(self.propensity <=1), "Propensity scores must be between 0 and 1"
         assert len(np.unique(self.groups)==2), "Wrong number of groups"
-                
+        self.nobs = self.groups.shape[0]
+        self.ntreat = np.sum(self.groups == 1)
+        self.ncontrol = np.sum(self.groups == 0)
+        
     def create(self, method='one-to-one', **kwargs):
         """
         Parameters
@@ -87,8 +90,10 @@ class Match(object):
 
         if method=='many-to-one':
             self._match_many(**kwargs)
+            self._match_info()
         elif method=='one-to-one':
             self._match_one(**kwargs)
+            self._match_info()
         else:
             raise ValueError('Invalid matching method')
             
@@ -110,6 +115,12 @@ class Match(object):
                 if not replace:
                     g2 = g2.drop(matches[m])
         self.matches = matches
+        self.weights = np.zeros(self.nobs)
+        mk = list(matches.keys())
+        mv = list(matches.values())
+        for i in range(len(matches)):
+            self.weights[mk[i]] += 1
+            self.weights[mv[i]] += 1
         
         
     def _match_many(self, many_method="knn", k=1, caliper=0.05, caliper_scale="propensity", replace=True):
@@ -161,3 +172,23 @@ class Match(object):
             if not replace:
                 g2 = g2.drop(matches[m])
         self.matches = matches
+        self.weights = np.zeros(self.nobs)
+        mk = list(matches.keys())
+        mv = list(matches.values())
+        for i in range(len(matches)):
+            self.weights[mk[i]] += 1
+            self.weights[mv[i]] += 1/len(mv[i])
+                
+
+    def _match_info(self):
+        '''
+        Helper function to create match info
+        '''
+        assert self.matches is not None, 'No matches yet!'
+        self.matches = {
+            'match_pairs' : self.matches,
+            'treated' : np.unique(list(self.matches.keys())),
+            'control' : np.unique(list(self.matches.values()))
+        }
+        self.matches['dropped'] = np.setdiff1d(list(range(self.nobs)), 
+                                    np.append(self.matches['treated'], self.matches['control']))
