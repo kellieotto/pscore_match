@@ -3,17 +3,19 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to pscore-match's documentation!
+Welcome to pscore_match's documentation!
 ========================================
+
+`pscore_match` is a package for analysis of observational data using propensity score matching.
 
 Contents:
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    api/index.rst
-
-
+   examples/index.rst
+   
 Indices and tables
 ==================
 

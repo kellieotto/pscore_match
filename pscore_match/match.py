@@ -35,8 +35,10 @@ def recode_groups(groups, propensity):
     # Code groups as 0 and 1
     groups = (groups == groups.unique()[0])
     N = len(groups)
-    N1 = groups[groups == 1].index; N2 = groups[groups == 0].index
-    g1, g2 = propensity[groups == 1], propensity[groups == 0]
+    N1 = groups[groups == 1].index
+    N2 = groups[groups == 0].index
+    g1 = propensity[groups == 1]
+    g2 = propensity[groups == 0]
     # Check if treatment groups got flipped - the smaller should correspond to N1/g1
     if len(N1) > len(N2):
        N1, N2, g1, g2 = N2, N1, g2, g1
@@ -161,14 +163,15 @@ class Match(object):
             dist = abs(g1[m] - g2)
             dist.sort_values(inplace=True)
             if many_method == "knn":
-                caliper = dist.iloc[k-1]
+                matches[m] = np.array(dist.nsmallest(n=k).index)
             # PROBLEM: when there are ties in the knn. 
             # Need to randomly select among the observations tied for the farthest acceptable distance
-            keep = np.array(dist[dist<=caliper].index)
-            if len(keep):
-                matches[m] = keep
             else:
-                matches[m] = np.array([dist.argmin()])
+                keep = np.array(dist[dist<=caliper].index)
+                if len(keep):
+                    matches[m] = keep
+                else:
+                    matches[m] = np.array([dist.argmin()])
             if not replace:
                 g2 = g2.drop(matches[m])
         self.matches = matches

@@ -1,5 +1,5 @@
-Core functions
---------------
+`pscore` module
+---------------
 
 .. automodule:: pscore_match.pscore
     :members:
