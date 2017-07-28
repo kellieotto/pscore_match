@@ -30,8 +30,9 @@ def gerber_green_imai():
     283-300.
     """
     fin = _os.path.join(data_dir, 'GerberGreenImai.txt')
-    return pd.read_table(fin, sep = '\s+')
-
+    data = pd.read_table(fin, sep = '\s+')
+    data.index = range(data.shape[0])
+    return data
 
 def dehejia_wahba():
     """
@@ -57,4 +58,5 @@ def dehejia_wahba():
     control = pd.read_table(fin_ct, sep='\s+', 
                             header = None, names = names)
     data = pd.concat([treated, control])
+    data.index = range(data.shape[0])
     return data
