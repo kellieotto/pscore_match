@@ -118,10 +118,13 @@ class Match(object):
                     g2 = g2.drop(matches[m])
         self.matches = matches
         self.weights = np.zeros(self.nobs)
+        self.freq = np.zeros(self.nobs)
         mk = list(matches.keys())
         mv = list(matches.values())
         for i in range(len(matches)):
+            self.freq[mk[i]] += 1
             self.weights[mk[i]] += 1
+            self.freq[mv[i]] += 1
             self.weights[mv[i]] += 1
         
         
@@ -176,10 +179,13 @@ class Match(object):
                 g2 = g2.drop(matches[m])
         self.matches = matches
         self.weights = np.zeros(self.nobs)
+        self.freq = np.zeros(self.nobs)
         mk = list(matches.keys())
         mv = list(matches.values())
         for i in range(len(matches)):
+            self.freq[mk[i]] += 1
             self.weights[mk[i]] += 1
+            self.freq[mv[i]] += 1
             self.weights[mv[i]] += 1/len(mv[i])
                 
 
@@ -195,3 +201,39 @@ class Match(object):
         }
         self.matches['dropped'] = np.setdiff1d(list(range(self.nobs)), 
                                     np.append(self.matches['treated'], self.matches['control']))
+
+
+################################################################################
+############################ helper funcs  #####################################
+################################################################################
+
+def whichMatched(matches, data, show_duplicates = True):
+    ''' 
+    Simple function to convert output of Matches to DataFrame of all matched observations
+    
+    Parameters
+    -----------
+    matches : Match
+        Match class object with matches already fit
+    data : DataFrame 
+        Dataframe with unique rows, for which we want to create new matched data.
+        This may be a dataframe of covariates, treatment, outcome, or any combination.
+    show_duplicates : bool
+        Should repeated matches be included as multiple rows? Default is True.
+        If False, then duplicates appear as one row but a column of weights is
+        added.
+    '''
+    
+    if show_duplicates:
+        indices = []
+        for i in range(len(matches.freq)):
+            j = matches.freq[i]
+            while j>0:
+                indices.append(i)
+                j -= 1
+        return data.ix[indices]
+    else:
+        data['weights'] = matches.weights
+        data['frequency'] = matches.freq
+        keep = data['frequency'] > 0
+        return data.loc[keep]
