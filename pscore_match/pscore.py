@@ -43,12 +43,6 @@ class PropensityScore(object):
         ----------
         
         """
-        ####### Using LogisticRegression from sklearn.linear_model    
-        #propensity = LogisticRegression()
-        #propensity.fit(predictors, groups)
-        #return propensity.predict_proba(predictors)[:,1]
-    
-        ####### Using sm.GLM
         predictors = sm.add_constant(self.covariates, prepend=False)
         if method == 'logistic':
             model = sm.Logit(self.treatment, predictors).fit(disp=False, warn_convergence=True)
@@ -57,10 +51,3 @@ class PropensityScore(object):
         else:
             raise ValueError('Unrecognized method')
         return model.predict()
-
-        ####### Using sm.formula.glm with formula call
-        #glm_binom = sm.formula.glm(formula = formula, data = data, family = sm.families.Binomial())
-        #res = glm_binom.fit()
-        #if verbosity:
-        #    print res.summary()
-        #return res.fittedvalues
