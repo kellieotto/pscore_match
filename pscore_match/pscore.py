@@ -41,7 +41,8 @@ class PropensityScore(object):
         
         Parameters
         ----------
-        
+        method : str
+            Propensity score estimation method. Either 'logistic' or 'probit'
         """
         predictors = sm.add_constant(self.covariates, prepend=False)
         if method == 'logistic':

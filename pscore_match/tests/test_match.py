@@ -6,8 +6,15 @@ from nose.tools import assert_raises, raises
 import numpy as np
 import pandas as pd
 
-from ..match import Match
+from ..match import Match, whichMatched
 from ..data import gerber_green_imai
+
+
+def create_example_matches(method='one-to-one'):
+    np.random.seed(23456)
+    match=Match(groups=[1,2,1,2], propensity=[0.1, 0.2, 0.15, 0.11])
+    match.create(method)
+    return match
 
 @raises(AssertionError)
 def test_match_errors():
@@ -32,9 +39,7 @@ def test_match_errors():
     match.create(method='many-to-one', caliper_method=None, many_method='caliper')
 
 def test_match_onetoone():
-    np.random.seed(23456)
-    match=Match(groups=[1,2,1,2], propensity=[0.1, 0.2, 0.15, 0.11])
-    match.create()
+    match = create_example_matches()
     expected_matches = {'match_pairs' : {0:3, 2:1},
                         'treated' : np.array([0, 2]),
                         'control' : np.array([1, 3]),
@@ -59,9 +64,7 @@ def test_match_onetoone():
     np.testing.assert_equal(match.weights, np.array([1,0,1,2]))
     
 def test_match_manytoone():
-    np.random.seed(23456)
-    match=Match(groups=[1,2,1,2], propensity=[0.1, 0.2, 0.15, 0.11])
-    match.create(method='many-to-one')
+    match = create_example_matches(method='many-to-one')
     expected_matches = {'match_pairs' : {0:np.array([3]), 2: np.array([3])},
                         'treated' : np.array([0,2]),
                         'control' : np.array([3]),
@@ -84,3 +87,23 @@ def test_match_manytoone():
                         'dropped' : np.array([])}
     np.testing.assert_equal(match.matches, expected_matches)    
     np.testing.assert_equal(match.weights, np.ones(4))
+    
+@raises(ValueError)
+def test_match_plot_inputs():
+    match = create_example_matches(method='one-to-one')
+    match.plot_balance(pd.DataFrame([0.1, 0.2, 0.15, 0.11]), test='fake')
+    
+
+def test_whichMatched():
+    df = pd.DataFrame([0.1, 0.2, 0.15, 0.11])
+    match = create_example_matches(method='many-to-one')
+    res = whichMatched(match, df)
+    np.testing.assert_equal(list(res[0]), list(df.ix[[0,2,3,3]][0]))
+    
+    res = whichMatched(match, df, show_duplicates=False)
+    np.testing.assert_equal(list(res[0]), list(df.ix[[0,2,3]][0]))
+    np.testing.assert_equal(list(res.frequency), [1,1,2])
+    
+    match.create(method='many-to-one', caliper_scale='logit', replace=False)
+    res = whichMatched(match, df)
+    np.testing.assert_equal(list(res[0]), list(df[0]))
