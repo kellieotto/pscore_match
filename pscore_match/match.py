@@ -8,7 +8,8 @@ import scipy
 from scipy.stats import binom, hypergeom, gaussian_kde, ttest_ind, ranksums
 import pandas as pd
 import matplotlib.pyplot as plt
-
+import plotly
+import plotly.graph_objs as go
 
 ################################################################################
 ################################# utils ########################################
@@ -298,3 +299,118 @@ def t_test(covariates, groups):
         res = ttest_ind(var[groups == 1], var[groups == 0])
         pvalues[j] = res.pvalue
     return pvalues
+    
+
+
+
+def plot_balance(matches, covariates, test=['t', 'rank']):
+    '''
+    Plot the p-values for covariate balance before and after matching
+    '''
+    
+    # check valid test inputs
+    test = list(test)
+    extra = set(test) - set(['t', 'rank'])
+    if len(extra) > 0:
+        raise ValueError('unidentified test was supplied')
+    
+    # use matches to create covariate and tr dataframes
+    covnames = list(covariates.columns)
+    matched_c = whichMatched(matches, covariates, show_duplicates=True)[covnames]
+    matched_g = whichMatched(matches, matches.groups, show_duplicates=True)
+    
+    trace0_t = None
+    trace1_t = None
+    trace0_rank = None
+    trace1_rank = None
+    # run tests, get pvalues
+    if 't' in test:
+        pvalues_before_t = t_test(covariates, matches.groups)
+        pvalues_after_t = t_test(matched_c, matched_g)
+        trace0_t = go.Scatter(
+            x=pvalues_before_t,
+            y=points,
+            mode='markers',
+            name='t-test p-values before matching',
+            marker=dict(
+                color='blue',
+                size=12,
+                symbol='circle',
+            )
+        )
+        trace1_t = go.Scatter(
+            x=pvalues_after_t,
+            y=points,
+            mode='markers',
+            name='t-test p-values after matching',
+            marker=dict(
+                color='pink',
+                size=12,
+                symbol='circle',
+            )
+        )
+    if 'rank' in test:
+        pvalues_before_rank = rank_test(covariates, matches.groups)
+        pvalues_after_rank = rank_test(matched_c, matched_g)
+        trace0_rank = go.Scatter(
+            x=pvalues_before_rank,
+            y=points,
+            mode='markers',
+            name='Wilcoxon test p-values before matching',
+            marker=dict(
+                color='blue',
+                size=12,
+                symbol='triangle-up',
+            )
+        )
+        trace1_rank = go.Scatter(
+            x=pvalues_after_rank,
+            y=points,
+            mode='markers',
+            name='Wilcoxon test p-values after matching',
+            marker=dict(
+                color='pink',
+                size=12,
+                symbol='triangle-up',
+            )
+        )
+        
+    # call code to create figure
+    data = [trace0_t, trace1_t, trace0_rank, trace1_rank]
+    layout = go.Layout(
+        title='Balance test p-values, before and after matching',
+        xaxis=dict(
+            showgrid=False,
+            showline=True,
+            linecolor='gray',
+            titlefont=dict(
+                color='gray'
+            ),
+            tickfont=dict(
+                color='gray'
+            ),
+            tickmode='array',
+            tickvals=[0, 0.05, 0.1, 0.5, 1],
+            ticktext=[0, 0.05, 0.1, 0.5, 1],
+            ticks='outside',
+            tickcolor='gray',
+        ),
+        margin=dict(
+            l=140,
+            r=40,
+            b=50,
+            t=150
+        ),
+        legend=dict(
+            font=dict(
+                size=10
+            ),
+            yanchor='middle',
+            xanchor='right',
+        ),
+        width=800,
+        height=600,
+        hovermode='closest'
+    )
+    fig = go.Figure(data=data, layout=layout)
+    plotly.offline.plot(fig, filename='balance-plot')
