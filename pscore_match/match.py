@@ -5,7 +5,7 @@ Implements several types of propensity score matching.
 from __future__ import division
 import numpy as np
 import scipy
-from scipy.stats import binom, hypergeom, gaussian_kde
+from scipy.stats import binom, hypergeom, gaussian_kde, ttest_ind, ranksums
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -237,3 +237,64 @@ def whichMatched(matches, data, show_duplicates = True):
         data['frequency'] = matches.freq
         keep = data['frequency'] > 0
         return data.loc[keep]
+        
+        
+################################################################################
+############################ balance tests  ####################################
+################################################################################
+    
+def rank_test(covariates, groups):
+    ''' 
+    Wilcoxon rank sum test for the distribution of treatment and control covariates
+    
+    TODO
+    
+    Parameters
+    -----------
+    covariates : DataFrame 
+        Dataframe with one covariate per column.
+        If matches are with replacement, then duplicates should be 
+        included as additional rows.
+    groups : array-like
+        treatment assignments, must be 2 groups
+    
+    Returns
+    -------
+    TODO
+    '''    
+    colnames = list(covariates.columns)
+    J = len(colnames)
+    pvalues = np.zeros(J)
+    for j in range(J):
+        var = covariates[colnames[j]]
+        res = ranksums(var[groups == 1], var[groups == 0])
+        pvalues[j] = res.pvalue
+    return pvalues
+    
+def t_test(covariates, groups):
+    ''' 
+    Two sample t test for the distribution of treatment and control covariates
+    
+    TODO
+    
+    Parameters
+    -----------
+    covariates : DataFrame 
+        Dataframe with one covariate per column.
+        If matches are with replacement, then duplicates should be 
+        included as additional rows.
+    groups : array-like
+        treatment assignments, must be 2 groups
+    
+    Returns
+    -------
+    TODO
+    '''
+    colnames = list(covariates.columns)
+    J = len(colnames)
+    pvalues = np.zeros(J)
+    for j in range(J):
+        var = covariates[colnames[j]]
+        res = ttest_ind(var[groups == 1], var[groups == 0])
+        pvalues[j] = res.pvalue
+    return pvalues
