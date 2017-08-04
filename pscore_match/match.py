@@ -99,7 +99,7 @@ class Match(object):
             self._match_info()
         else:
             raise ValueError('Invalid matching method')
-            
+
     def _match_one(self, caliper_scale=None, caliper=0.05, replace=False):
         """
         Implements greedy one-to-one matching on propensity scores.
@@ -127,8 +127,7 @@ class Match(object):
             self.weights[mk[i]] += 1
             self.freq[mv[i]] += 1
             self.weights[mv[i]] += 1
-        
-        
+
     def _match_many(self, many_method="knn", k=1, caliper=0.05, caliper_scale="propensity", replace=True):
         ''' 
         Implements greedy one-to-many matching on propensity scores.
@@ -188,7 +187,6 @@ class Match(object):
             self.weights[mk[i]] += 1
             self.freq[mv[i]] += 1
             self.weights[mv[i]] += 1/len(mv[i])
-                
 
     def _match_info(self):
         '''
@@ -202,6 +200,143 @@ class Match(object):
         }
         self.matches['dropped'] = np.setdiff1d(list(range(self.nobs)), 
                                     np.append(self.matches['treated'], self.matches['control']))
+
+    def plot_balance(self, covariates, test=['t', 'rank'], filename='balance-plot'):
+        '''
+        Plot the p-values for covariate balance before and after matching
+
+        Parameters
+        -----------
+        matches : Match
+            Match class object with matches already fit
+        covariates : DataFrame 
+            Dataframe for with all observations and one covariate per column.
+        test : array-like or str
+            Statistical test to compare treatment and control covariate distributions.
+            Options are 't' for a two sample t-test or 'rank' for Wilcoxon rank sum test
+        filename : str
+            Optional, name of file to save plot in.
+        Returns
+        -------
+        None; has the side effect of creating a file
+        '''
+    
+        # check valid test inputs
+        test = list(test)
+        extra = set(test) - set(['t', 'rank'])
+        if len(extra) > 0:
+            raise ValueError('unidentified test was supplied')
+    
+        # use matches to create covariate and tr dataframes
+        covnames = list(covariates.columns)
+        matched_c = whichMatched(self, covariates, show_duplicates=True)[covnames]
+        matched_g = whichMatched(self, self.groups, show_duplicates=True)
+    
+        trace0_t = None
+        trace1_t = None
+        trace0_rank = None
+        trace1_rank = None
+        # run tests, get pvalues
+        if 't' in test:
+            pvalues_before_t = t_test(covariates, self.groups)
+            pvalues_after_t = t_test(matched_c, matched_g)
+            trace0_t = go.Scatter(
+                x=pvalues_before_t,
+                y=covnames,
+                mode='markers',
+                name='t-test p-values before matching',
+                marker=dict(
+                    color='blue',
+                    size=12,
+                    symbol='circle',
+                )
+            )
+            trace1_t = go.Scatter(
+                x=pvalues_after_t,
+                y=covnames,
+                mode='markers',
+                name='t-test p-values after matching',
+                marker=dict(
+                    color='pink',
+                    size=12,
+                    symbol='circle',
+                )
+            )
+        if 'rank' in test:
+            pvalues_before_rank = rank_test(covariates, self.groups)
+            pvalues_after_rank = rank_test(matched_c, matched_g)
+            trace0_rank = go.Scatter(
+                x=pvalues_before_rank,
+                y=covnames,
+                mode='markers',
+                name='Wilcoxon test p-values before matching',
+                marker=dict(
+                    color='blue',
+                    size=12,
+                    symbol='triangle-up',
+                )
+            )
+            trace1_rank = go.Scatter(
+                x=pvalues_after_rank,
+                y=covnames,
+                mode='markers',
+                name='Wilcoxon test p-values after matching',
+                marker=dict(
+                    color='pink',
+                    size=12,
+                    symbol='triangle-up',
+                )
+            )
+        
+        # call code to create figure
+        data = [trace0_t, trace1_t, trace0_rank, trace1_rank]
+        layout = go.Layout(
+            title='Balance test p-values, before and after matching',
+            xaxis=dict(
+                showgrid=False,
+                showline=True,
+                linecolor='gray',
+                titlefont=dict(
+                    color='gray'
+                ),
+                tickfont=dict(
+                    color='gray'
+                ),
+                tickmode='array',
+                tickvals=[0, 0.05, 0.1, 0.5, 1],
+                ticktext=[0, 0.05, 0.1, 0.5, 1],
+                ticks='outside',
+                tickcolor='gray',
+            ),
+            margin=dict(
+                l=140,
+                r=40,
+                b=80,
+                t=80
+            ),
+            legend=dict(
+                font=dict(
+                    size=10
+                ),
+                orientation='h'
+            ),
+            shapes=[dict(
+                type='line',
+                x0=0.05,
+                x1=0.05,
+                y0=-1,
+                y1=len(covnames),
+                line=dict(
+                    color='gray',
+                    dash='dot'
+                ),
+            )],
+            width=800,
+            height=600,
+            hovermode='closest'
+        )
+        fig = go.Figure(data=data, layout=layout)
+        plotly.offline.plot(fig, filename=filename)
 
 
 ################################################################################
@@ -238,12 +373,8 @@ def whichMatched(matches, data, show_duplicates = True):
         data['frequency'] = matches.freq
         keep = data['frequency'] > 0
         return data.loc[keep]
-        
-        
-################################################################################
-############################ balance tests  ####################################
-################################################################################
-    
+
+
 def rank_test(covariates, groups):
     ''' 
     Wilcoxon rank sum test for the distribution of treatment and control covariates
@@ -300,117 +431,3 @@ def t_test(covariates, groups):
         pvalues[j] = res.pvalue
     return pvalues
     
-
-
-
-def plot_balance(matches, covariates, test=['t', 'rank']):
-    '''
-    Plot the p-values for covariate balance before and after matching
-    '''
-    
-    # check valid test inputs
-    test = list(test)
-    extra = set(test) - set(['t', 'rank'])
-    if len(extra) > 0:
-        raise ValueError('unidentified test was supplied')
-    
-    # use matches to create covariate and tr dataframes
-    covnames = list(covariates.columns)
-    matched_c = whichMatched(matches, covariates, show_duplicates=True)[covnames]
-    matched_g = whichMatched(matches, matches.groups, show_duplicates=True)
-    
-    trace0_t = None
-    trace1_t = None
-    trace0_rank = None
-    trace1_rank = None
-    # run tests, get pvalues
-    if 't' in test:
-        pvalues_before_t = t_test(covariates, matches.groups)
-        pvalues_after_t = t_test(matched_c, matched_g)
-        trace0_t = go.Scatter(
-            x=pvalues_before_t,
-            y=points,
-            mode='markers',
-            name='t-test p-values before matching',
-            marker=dict(
-                color='blue',
-                size=12,
-                symbol='circle',
-            )
-        )
-        trace1_t = go.Scatter(
-            x=pvalues_after_t,
-            y=points,
-            mode='markers',
-            name='t-test p-values after matching',
-            marker=dict(
-                color='pink',
-                size=12,
-                symbol='circle',
-            )
-        )
-    if 'rank' in test:
-        pvalues_before_rank = rank_test(covariates, matches.groups)
-        pvalues_after_rank = rank_test(matched_c, matched_g)
-        trace0_rank = go.Scatter(
-            x=pvalues_before_rank,
-            y=points,
-            mode='markers',
-            name='Wilcoxon test p-values before matching',
-            marker=dict(
-                color='blue',
-                size=12,
-                symbol='triangle-up',
-            )
-        )
-        trace1_rank = go.Scatter(
-            x=pvalues_after_rank,
-            y=points,
-            mode='markers',
-            name='Wilcoxon test p-values after matching',
-            marker=dict(
-                color='pink',
-                size=12,
-                symbol='triangle-up',
-            )
-        )
-        
-    # call code to create figure
-    data = [trace0_t, trace1_t, trace0_rank, trace1_rank]
-    layout = go.Layout(
-        title='Balance test p-values, before and after matching',
-        xaxis=dict(
-            showgrid=False,
-            showline=True,
-            linecolor='gray',
-            titlefont=dict(
-                color='gray'
-            ),
-            tickfont=dict(
-                color='gray'
-            ),
-            tickmode='array',
-            tickvals=[0, 0.05, 0.1, 0.5, 1],
-            ticktext=[0, 0.05, 0.1, 0.5, 1],
-            ticks='outside',
-            tickcolor='gray',
-        ),
-        margin=dict(
-            l=140,
-            r=40,
-            b=50,
-            t=150
-        ),
-        legend=dict(
-            font=dict(
-                size=10
-            ),
-            yanchor='middle',
-            xanchor='right',
-        ),
-        width=800,
-        height=600,
-        hovermode='closest'
-    )
-    fig = go.Figure(data=data, layout=layout)
-    plotly.offline.plot(fig, filename='balance-plot')
