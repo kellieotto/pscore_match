@@ -387,10 +387,11 @@ def whichMatched(matches, data, show_duplicates = True):
                 j -= 1
         return data.ix[indices]
     else:
-        data['weights'] = matches.weights
-        data['frequency'] = matches.freq
-        keep = data['frequency'] > 0
-        return data.loc[keep]
+        dat2 = data.copy()
+        dat2['weights'] = matches.weights
+        dat2['frequency'] = matches.freq
+        keep = dat2['frequency'] > 0
+        return dat2.loc[keep]
 
 
 def rank_test(covariates, groups):
