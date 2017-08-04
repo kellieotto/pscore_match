@@ -52,7 +52,7 @@ def recode_groups(groups, propensity):
 class Match(object):
     """
     Parameters
-    -----------
+    ----------
     groups : array-like 
         treatment assignments, must be 2 groups
     propensity : array-like 
@@ -73,7 +73,7 @@ class Match(object):
     def create(self, method='one-to-one', **kwargs):
         """
         Parameters
-        -----------
+        ----------
         method : string
             'one-to-one' (default) or 'many-to-one'
         caliper_scale: string
@@ -86,7 +86,7 @@ class Match(object):
             (default is False)
     
         Returns
-        --------
+        -------
         A series containing the individuals in the control group matched to the treatment group.
         Note that with caliper matching, not every treated individual may have a match.
         """
@@ -103,6 +103,17 @@ class Match(object):
     def _match_one(self, caliper_scale=None, caliper=0.05, replace=False):
         """
         Implements greedy one-to-one matching on propensity scores.
+
+        Parameters
+        ----------
+        caliper_scale: string
+            "propensity" (default) if caliper is a maximum difference in propensity scores,
+            "logit" if caliper is a maximum SD of logit propensity, or "none" for no caliper
+        caliper : float
+             specifies maximum distance (difference in propensity scores or SD of logit propensity) 
+        replace : bool
+            should individuals from the larger group be allowed to match multiple individuals in the smaller group?
+            (default is False)
         """
         caliper = set_caliper(caliper_scale, caliper, self.propensity)
         groups, N1, N2, g1, g2 = recode_groups(self.groups, self.propensity)
@@ -129,11 +140,11 @@ class Match(object):
             self.weights[mv[i]] += 1
 
     def _match_many(self, many_method="knn", k=1, caliper=0.05, caliper_scale="propensity", replace=True):
-        ''' 
+        """ 
         Implements greedy one-to-many matching on propensity scores.
 
         Parameters
-        -----------
+        ----------
         many_method : string
             "caliper" (default) to select all matches within a given range, "knn" for k nearest neighbors,
         k : int
@@ -146,13 +157,7 @@ class Match(object):
         replace : bool
             should individuals from the larger group be allowed to match multiple individuals in the smaller group?
             (default is False)
-
-        Returns
-        --------
-        A series containing the individuals in the control group matched to the treatment group.
-        Note that with caliper matching, not every treated individual may have a match within calipers.
-            In that case we match it to its single nearest neighbor.  The alternative is to throw out individuals with no matches, but then we'd no longer be estimating the ATT.
-        '''
+        """
         if many_method=="caliper":
             assert caliper_scale is not None, "Choose a caliper"
         caliper = set_caliper(caliper_scale, caliper, self.propensity)
@@ -189,9 +194,9 @@ class Match(object):
             self.weights[mv[i]] += 1/len(mv[i])
 
     def _match_info(self):
-        '''
+        """
         Helper function to create match info
-        '''
+        """
         assert self.matches is not None, 'No matches yet!'
         self.matches = {
             'match_pairs' : self.matches,
@@ -201,12 +206,13 @@ class Match(object):
         self.matches['dropped'] = np.setdiff1d(list(range(self.nobs)), 
                                     np.append(self.matches['treated'], self.matches['control']))
 
-    def plot_balance(self, covariates, test=['t', 'rank'], filename='balance-plot'):
-        '''
+    def plot_balance(self, covariates, test=['t', 'rank'], filename='balance-plot',
+                     **kwargs):
+        """
         Plot the p-values for covariate balance before and after matching
 
         Parameters
-        -----------
+        ----------
         matches : Match
             Match class object with matches already fit
         covariates : DataFrame 
@@ -215,12 +221,19 @@ class Match(object):
             Statistical test to compare treatment and control covariate distributions.
             Options are 't' for a two sample t-test or 'rank' for Wilcoxon rank sum test
         filename : str
-            Optional, name of file to save plot in.
+            Optional, name of file to save plot in. Default 'balance-plot'
+        kwargs : dict
+            Key word arguments to pass into plotly.offline.plot
+
         Returns
         -------
-        None; has the side effect of creating a file
-        '''
-    
+        None
+
+        Notes
+        -----
+        Creates a file with given filename
+        """
+
         # check valid test inputs
         test = list(test)
         extra = set(test) - set(['t', 'rank'])
@@ -336,7 +349,7 @@ class Match(object):
             hovermode='closest'
         )
         fig = go.Figure(data=data, layout=layout)
-        plotly.offline.plot(fig, filename=filename)
+        plotly.offline.plot(fig, filename=filename, show_link=False, **kwargs)
 
 
 ################################################################################
@@ -344,11 +357,11 @@ class Match(object):
 ################################################################################
 
 def whichMatched(matches, data, show_duplicates = True):
-    ''' 
+    """ 
     Simple function to convert output of Matches to DataFrame of all matched observations
     
     Parameters
-    -----------
+    ----------
     matches : Match
         Match class object with matches already fit
     data : DataFrame 
@@ -358,7 +371,12 @@ def whichMatched(matches, data, show_duplicates = True):
         Should repeated matches be included as multiple rows? Default is True.
         If False, then duplicates appear as one row but a column of weights is
         added.
-    '''
+    
+    Returns
+    -------
+    DataFrame containing only the treatment group and matched controls,
+    with the same columns as input data
+    """
     
     if show_duplicates:
         indices = []
@@ -376,13 +394,11 @@ def whichMatched(matches, data, show_duplicates = True):
 
 
 def rank_test(covariates, groups):
-    ''' 
-    Wilcoxon rank sum test for the distribution of treatment and control covariates
-    
-    TODO
+    """ 
+    Wilcoxon rank sum test for the distribution of treatment and control covariates.
     
     Parameters
-    -----------
+    ----------
     covariates : DataFrame 
         Dataframe with one covariate per column.
         If matches are with replacement, then duplicates should be 
@@ -392,8 +408,8 @@ def rank_test(covariates, groups):
     
     Returns
     -------
-    TODO
-    '''    
+    A list of p-values, one for each column in covariates
+    """    
     colnames = list(covariates.columns)
     J = len(colnames)
     pvalues = np.zeros(J)
@@ -404,13 +420,11 @@ def rank_test(covariates, groups):
     return pvalues
     
 def t_test(covariates, groups):
-    ''' 
+    """ 
     Two sample t test for the distribution of treatment and control covariates
     
-    TODO
-    
     Parameters
-    -----------
+    ----------
     covariates : DataFrame 
         Dataframe with one covariate per column.
         If matches are with replacement, then duplicates should be 
@@ -420,8 +434,8 @@ def t_test(covariates, groups):
     
     Returns
     -------
-    TODO
-    '''
+    A list of p-values, one for each column in covariates
+    """
     colnames = list(covariates.columns)
     J = len(colnames)
     pvalues = np.zeros(J)
