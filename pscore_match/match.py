@@ -1,5 +1,12 @@
 """
-Implements several types of propensity score matching.
+This module implements several variants of matching: 
+one-to-one matching, one-to-many matching, with or without a caliper, 
+and without or without replacement. 
+Variants of the methods are examined in Austin (2014).
+
+
+Austin, P. C. (2014), A comparison of 12 algorithms for matching on the 
+propensity score. Statistic. Med., 33: 1057-1069.
 """
 
 from __future__ import division
