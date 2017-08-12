@@ -1,0 +1,291 @@
+
+
+<!doctype html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>match module &mdash; pscore-match 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../_static/bizstyle.js"></script>
+    <link rel="top" title="pscore-match 0.0.1 documentation" href="../index.html" />
+    <link rel="up" title="Package documentation" href="index.html" />
+    <link rel="next" title="Examples" href="../examples/index.html" />
+    <link rel="prev" title="pscore module" href="pscore.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../examples/index.html" title="Examples"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="pscore.html" title="pscore module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pscore-match 0.0.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Package documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="pscore.html"
+                        title="previous chapter"><cite>pscore</cite> module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../examples/index.html"
+                        title="next chapter">Examples</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/match.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-pscore_match.match">
+<span id="match-module"></span><h1><cite>match</cite> module<a class="headerlink" href="#module-pscore_match.match" title="Permalink to this headline">¶</a></h1>
+<p>This module implements several variants of matching:
+one-to-one matching, one-to-many matching, with or without a caliper,
+and without or without replacement.
+Variants of the methods are examined in Austin (2014).</p>
+<p>Austin, P. C. (2014), A comparison of 12 algorithms for matching on the
+propensity score. Statistic. Med., 33: 1057-1069.</p>
+<dl class="class">
+<dt id="pscore_match.match.Match">
+<em class="property">class </em><code class="descclassname">pscore_match.match.</code><code class="descname">Match</code><span class="sig-paren">(</span><em>groups</em>, <em>propensity</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pscore_match/match.html#Match"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pscore_match.match.Match" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>groups</strong> (<em>array-like</em>) &#8211; treatment assignments, must be 2 groups</li>
+<li><strong>propensity</strong> (<em>array-like</em>) &#8211; object containing propensity scores for each observation.
+Propensity and groups should be in the same order (matching indices)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="pscore_match.match.Match.create">
+<code class="descname">create</code><span class="sig-paren">(</span><em>method='one-to-one'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pscore_match/match.html#Match.create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pscore_match.match.Match.create" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>method</strong> (<em>string</em>) &#8211; &#8216;one-to-one&#8217; (default) or &#8216;many-to-one&#8217;</li>
+<li><strong>caliper_scale</strong> (<em>string</em>) &#8211; &#8220;propensity&#8221; (default) if caliper is a maximum difference in propensity scores,
+&#8220;logit&#8221; if caliper is a maximum SD of logit propensity, or &#8220;none&#8221; for no caliper</li>
+<li><strong>caliper</strong> (<em>float</em>) &#8211; specifies maximum distance (difference in propensity scores or SD of logit propensity)</li>
+<li><strong>replace</strong> (<em>bool</em>) &#8211; should individuals from the larger group be allowed to match multiple individuals in the smaller group?
+(default is False)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><em>A series containing the individuals in the control group matched to the treatment group.</em></li>
+<li><em>Note that with caliper matching, not every treated individual may have a match.</em></li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pscore_match.match.Match.plot_balance">
+<code class="descname">plot_balance</code><span class="sig-paren">(</span><em>covariates, test=['t', 'rank'], filename='balance-plot', **kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pscore_match/match.html#Match.plot_balance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pscore_match.match.Match.plot_balance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the p-values for covariate balance before and after matching</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>matches</strong> (<a class="reference internal" href="#pscore_match.match.Match" title="pscore_match.match.Match"><em>Match</em></a>) &#8211; Match class object with matches already fit</li>
+<li><strong>covariates</strong> (<em>DataFrame</em>) &#8211; Dataframe for with all observations and one covariate per column.</li>
+<li><strong>test</strong> (<em>array-like or str</em>) &#8211; Statistical test to compare treatment and control covariate distributions.
+Options are &#8216;t&#8217; for a two sample t-test or &#8216;rank&#8217; for Wilcoxon rank sum test</li>
+<li><strong>filename</strong> (<em>str</em>) &#8211; Optional, name of file to save plot in. Default &#8216;balance-plot&#8217;</li>
+<li><strong>kwargs</strong> (<em>dict</em>) &#8211; Key word arguments to pass into plotly.offline.plot</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Creates a file with given filename</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="pscore_match.match.rank_test">
+<code class="descclassname">pscore_match.match.</code><code class="descname">rank_test</code><span class="sig-paren">(</span><em>covariates</em>, <em>groups</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pscore_match/match.html#rank_test"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pscore_match.match.rank_test" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wilcoxon rank sum test for the distribution of treatment and control covariates.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>covariates</strong> (<em>DataFrame</em>) &#8211; Dataframe with one covariate per column.
+If matches are with replacement, then duplicates should be
+included as additional rows.</li>
+<li><strong>groups</strong> (<em>array-like</em>) &#8211; treatment assignments, must be 2 groups</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">A list of p-values, one for each column in covariates</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pscore_match.match.t_test">
+<code class="descclassname">pscore_match.match.</code><code class="descname">t_test</code><span class="sig-paren">(</span><em>covariates</em>, <em>groups</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pscore_match/match.html#t_test"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pscore_match.match.t_test" title="Permalink to this definition">¶</a></dt>
+<dd><p>Two sample t test for the distribution of treatment and control covariates</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>covariates</strong> (<em>DataFrame</em>) &#8211; Dataframe with one covariate per column.
+If matches are with replacement, then duplicates should be
+included as additional rows.</li>
+<li><strong>groups</strong> (<em>array-like</em>) &#8211; treatment assignments, must be 2 groups</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">A list of p-values, one for each column in covariates</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pscore_match.match.whichMatched">
+<code class="descclassname">pscore_match.match.</code><code class="descname">whichMatched</code><span class="sig-paren">(</span><em>matches</em>, <em>data</em>, <em>show_duplicates=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pscore_match/match.html#whichMatched"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pscore_match.match.whichMatched" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple function to convert output of Matches to DataFrame of all matched observations</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>matches</strong> (<a class="reference internal" href="#pscore_match.match.Match" title="pscore_match.match.Match"><em>Match</em></a>) &#8211; Match class object with matches already fit</li>
+<li><strong>data</strong> (<em>DataFrame</em>) &#8211; Dataframe with unique rows, for which we want to create new matched data.
+This may be a dataframe of covariates, treatment, outcome, or any combination.</li>
+<li><strong>show_duplicates</strong> (<em>bool</em>) &#8211; Should repeated matches be included as multiple rows? Default is True.
+If False, then duplicates appear as one row but a column of weights is
+added.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><em>DataFrame containing only the treatment group and matched controls,</em></li>
+<li><em>with the same columns as input data</em></li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../examples/index.html" title="Examples"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="pscore.html" title="pscore module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">pscore-match 0.0.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Package documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2017, Kellie Ottoboni.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+    </div>
+  </body>
+</html>

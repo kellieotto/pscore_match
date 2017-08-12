@@ -1,1 +1,174 @@
-First commit
+
+
+<!doctype html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Welcome to pscore_match’s documentation! &mdash; pscore-match 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/bizstyle.js"></script>
+    <link rel="top" title="pscore-match 0.0.1 documentation" href="#" />
+    <link rel="next" title="Package documentation" href="api/index.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="api/index.html" title="Package documentation"
+             accesskey="N">next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">pscore-match 0.0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Welcome to pscore_match&#8217;s documentation!</a></li>
+<li><a class="reference internal" href="#about">About</a></li>
+<li><a class="reference internal" href="#api-reference">API Reference</a></li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+  <h4>Next topic</h4>
+  <p class="topless"><a href="api/index.html"
+                        title="next chapter">Package documentation</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="welcome-to-pscore-match-s-documentation">
+<h1>Welcome to pscore_match&#8217;s documentation!<a class="headerlink" href="#welcome-to-pscore-match-s-documentation" title="Permalink to this headline">¶</a></h1>
+<p><cite>pscore_match</cite> is a package for analysis of observational data using propensity score matching.</p>
+<p><a class="reference external" href="https://github.com/kellieotto/pscore_match">Download the package here!</a></p>
+<p>Questions, comments, and contributions are welcome.</p>
+</div>
+<div class="section" id="about">
+<h1>About<a class="headerlink" href="#about" title="Permalink to this headline">¶</a></h1>
+<p>Propensity score matching is a method to match treated and control group individuals in observational studies in order to better estimate the effect of the treatment or exposure on the outcome of interest.
+This is done in two steps:
+1) Estimate the <strong>propensity score</strong>, the conditional probability of receiving treatment given the covariates
+2) Match pairs with the same (or similar) propensity scores.</p>
+<p>The idea is that the individuals in these pairs were equally likely to receive the treatment, so their outcome should be unconfounded with the covariates.
+The math is a bit more complicated than that, but that&#8217;s the general intuition behind the method.
+Pairs should be similar in their covariates and outcomes, except for the effect of the treatment.</p>
+<p>The tricky thing about propensity score matching is that there&#8217;s no single good way to do it.
+There are different methods which give different results, but there&#8217;s one testable implication:
+the best estimate of the propensity score is the one which gives you the best covariate balance.
+This package includes functions to test for covariate balance.
+Typically, you would iterate between estimating propensity scores and checking for covariate balance.
+If the balance is insufficient, you&#8217;d redo the estimation using different covariates.</p>
+<p>If your estimated propensities are wrong, then you&#8217;re screwed right off the bat.
+But assuming they&#8217;re alright, then how do you pick the &#8220;best&#8221; treatment-control pairs?
+You could try every possible pairing and minimize the within-pair differences in propensity, but that&#8217;s computationally intensive.
+What&#8217;s typically done is greedy matching, but even then there are a number of factors to decide: in what order do we match the treated to controls?
+Do we match with or without replacement, allowing one control&nbsp;to be matched to one or more cases?
+Do we use a caliper to set a maximum difference in propensities, and if so how do we pick the caliper?
+The package includes options to vary all of these choices.</p>
+</div>
+<div class="section" id="api-reference">
+<h1>API Reference<a class="headerlink" href="#api-reference" title="Permalink to this headline">¶</a></h1>
+<p>Contents:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/index.html">Package documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/pscore.html"><cite>pscore</cite> module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/match.html"><cite>match</cite> module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples/index.html">Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples/ggi.html">Gerber-Green-Imai replication</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><span>Index</span></a></li>
+<li><a class="reference internal" href="py-modindex.html"><span>Module Index</span></a></li>
+<li><a class="reference internal" href="search.html"><span>Search Page</span></a></li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="api/index.html" title="Package documentation"
+             >next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">pscore-match 0.0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2017, Kellie Ottoboni.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+    </div>
+  </body>
+</html>
