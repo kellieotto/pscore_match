@@ -1,7 +1,5 @@
 """
-Implements several propensity score estimation, balance diagnostics for 
-group characteristics, average treatment effect on the treated (ATT) estimates, 
-and bootstraping to estimate standard errors of the estimated ATT.
+This module contains a class to estimate propensity scores.
 """
 
 from __future__ import division
@@ -18,7 +16,11 @@ import statsmodels.api as sm
 
 class PropensityScore(object):
     """
-    doc
+    Estimate the propensity score for each observation.
+    
+    The compute method uses a generalized linear model to regress treatment on covariates to estimate the propensity score. 
+    This is not the only way to estimate the propensity score, but it is the most common.
+    The two options allowed are logistic regression and probit regression.
     """
 
     def __init__(self, treatment, covariates):
