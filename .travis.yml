@@ -34,5 +34,5 @@ script: nosetests
 #  - cd doc && make html && cd ..
 #  - cd doc && make doctest && cd ..
 
-#after_success:
-#  - if [ "${COVERAGE}" == "1" ]; then coveralls; fi
+after_success:
+  - if [ "${COVERAGE}" == "1" ]; then coveralls; fi
