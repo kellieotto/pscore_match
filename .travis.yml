@@ -24,9 +24,7 @@ install:
   - python setup.py install
 
 # command to run tests
-script: 
-  - nosetests
-  - coverage run --source=pscore_match setup.py test
+script: nosetests pscore_match --with-coverage --cover-package=pscore_match -v
 
 after_success:
   - if [ "${COVERAGE}" == "1" ]; then coveralls; fi
