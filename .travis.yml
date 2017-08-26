@@ -22,17 +22,11 @@ before_install:
 
 install:
   - python setup.py install
-#  
 
 # command to run tests
-script: nosetests
-
-
-#script:
-#  - make coverage
-#  - pip install -r requirements/doc.txt
-#  - cd doc && make html && cd ..
-#  - cd doc && make doctest && cd ..
+script: 
+  - nosetests
+  - coverage run --source=pscore_match setup.py test
 
 after_success:
   - if [ "${COVERAGE}" == "1" ]; then coveralls; fi
