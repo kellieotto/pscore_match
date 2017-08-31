@@ -103,3 +103,4 @@ ENV/
 # Sphinx documentation
 doc/build/
 doc/source/_static/test.png
+.idea/
