@@ -83,5 +83,5 @@ if __name__ == "__main__":
         tests_require=TESTS_REQUIRE,
         include_package_data=True,
 
-        packages=find_packages,
+        packages=find_packages(),
     )
