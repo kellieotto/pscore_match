@@ -5,7 +5,6 @@ descr = """Propensity score matching
 
 import os
 
-
 DISTNAME = 'pscore_match'
 DESCRIPTION = 'Propensity score matching'
 LONG_DESCRIPTION = descr
@@ -14,12 +13,13 @@ AUTHOR_EMAIL = 'kellieotto@berkeley.edu'
 URL = 'http://www.github.com/kellieotto/pscore_match'
 LICENSE = 'BSD 2 License'
 DOWNLOAD_URL = 'http://www.github.com/kellieotto/pscore_match'
-VERSION = '0.1dev'
-PYTHON_VERSION = (2, 7)
+VERSION = '0.1.0.dev0'
+PYTHON_VERSION = (3, 6)
 
 INSTALL_REQUIRES = [
     'numpy',
-    'scipy'
+    'scipy',
+    'plotly'
 ]
 
 TESTS_REQUIRE = [
@@ -46,10 +46,10 @@ version='%s'
 
 
 if __name__ == "__main__":
-
     write_version_py()
 
-    from setuptools import setup
+    from setuptools import setup, find_packages
+
     setup(
         name=DISTNAME,
         version=VERSION,
@@ -71,6 +71,7 @@ if __name__ == "__main__":
             'Programming Language :: Python :: 2.7',
             'Programming Language :: Python :: 3.4',
             'Programming Language :: Python :: 3.5',
+            'Programming Language :: Python :: 3.6',
             'Topic :: Scientific/Engineering',
             'Operating System :: Microsoft :: Windows',
             'Operating System :: POSIX',
@@ -80,6 +81,7 @@ if __name__ == "__main__":
 
         install_requires=INSTALL_REQUIRES,
         tests_require=TESTS_REQUIRE,
+        include_package_data=True,
 
-        packages=['pscore_match', 'pscore_match.tests',],
+        packages=find_packages(),
     )
