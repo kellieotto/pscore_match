@@ -213,7 +213,7 @@ class Match(object):
         self.matches['dropped'] = np.setdiff1d(list(range(self.nobs)), 
                                     np.append(self.matches['treated'], self.matches['control']))
 
-    def plot_balance(self, covariates, test=['t', 'rank'], filename='balance-plot',
+    def plot_balance(self, covariates, test=['t', 'rank'], notebook=False, filename='balance-plot',
                      **kwargs):
         """
         Plot the p-values for covariate balance before and after matching
@@ -227,6 +227,8 @@ class Match(object):
         test : array-like or str
             Statistical test to compare treatment and control covariate distributions.
             Options are 't' for a two sample t-test or 'rank' for Wilcoxon rank sum test
+        notebook : bool
+            Optional, plot inline in a Jupyter notebook? Default False
         filename : str
             Optional, name of file to save plot in. Default 'balance-plot'
         kwargs : dict
@@ -356,7 +358,10 @@ class Match(object):
             hovermode='closest'
         )
         fig = go.Figure(data=data, layout=layout)
-        plotly.offline.plot(fig, filename=filename, show_link=False, **kwargs)
+        if notebook:
+            plotly.offline.iplot(fig, filename=filename, show_link=False, **kwargs)
+        else:
+            plotly.offline.plot(fig, filename=filename, show_link=False, **kwargs)
 
 
 ################################################################################
