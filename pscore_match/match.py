@@ -397,7 +397,7 @@ def whichMatched(matches, data, show_duplicates = True):
             while j>0:
                 indices.append(i)
                 j -= 1
-        return data.ix[indices]
+        return data.iloc[indices]
     else:
         dat2 = data.copy()
         dat2['weights'] = matches.weights
